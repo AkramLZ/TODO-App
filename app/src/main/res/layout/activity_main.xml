@@ -51,7 +51,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
-        android:padding="30dp"
         android:text="You don't have an account yet? Sign up"
         android:textSize="20sp" />
 
