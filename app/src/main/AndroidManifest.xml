@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication" >
         <activity
+            android:name=".AddTaskActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TasksActivity"
+            android:exported="false" />
+        <activity
             android:name=".WelcomeActivity"
             android:exported="false" />
         <activity

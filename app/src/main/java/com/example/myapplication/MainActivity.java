@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
             String emailText=email.getText().toString();
             String password=pass.getText().toString();
             if(emailText.equals("user@gmail.com") && password.equals("123456")){
-                Toast.makeText(this,"connected",Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this,WelcomeActivity.class);
+                Toast.makeText(this,"Logged in",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this,TasksActivity.class);
                 intent.putExtra("email",emailText);
                 startActivity(intent);
             }else if(emailText.isEmpty() || password.isEmpty()){
