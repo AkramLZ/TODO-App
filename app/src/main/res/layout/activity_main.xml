@@ -15,7 +15,7 @@
         android:layout_width="236dp"
         android:layout_height="236dp"
         android:layout_gravity="center|center_horizontal"
-        app:srcCompat="@drawable/todoLogo" />
+        app:srcCompat="@drawable/logo" />
 
     <EditText
         android:id="@+id/et_email"
