@@ -42,15 +42,6 @@
         android:inputType="number" />
 
     <EditText
-        android:id="@+id/et_signup_adress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:ems="10"
-        android:hint="Adress"
-        android:inputType="textPostalAddress" />
-
-    <EditText
         android:id="@+id/et_signup_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

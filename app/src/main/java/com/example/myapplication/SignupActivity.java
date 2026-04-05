@@ -21,7 +21,6 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
         EditText email=findViewById(R.id.et_signup_email);
         EditText age=findViewById(R.id.et_signup_age);
-        EditText adress=findViewById(R.id.et_signup_adress);
         EditText pass = findViewById(R.id.et_signup_password);
         EditText conpass=findViewById(R.id.et_signup_confpassword);
         Button signup=findViewById(R.id.btn_signup);
