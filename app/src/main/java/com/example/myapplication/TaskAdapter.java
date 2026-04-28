@@ -111,10 +111,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             statusColor = Color.GRAY;
         } else {
             switch (task.getStatus()) {
-                case "In Progress":
+                case Task.STATUS_IN_PROGRESS:
                     statusColor = Color.parseColor("#378ADD"); // blue
                     break;
-                case "Completed":
+                case Task.STATUS_COMPLETED:
                     statusColor = Color.parseColor("#639922"); // green
                     break;
                 default:
@@ -124,7 +124,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
         holder.tvStatus.setTextColor(statusColor);
 
-        boolean isCompleted = "Completed".equals(task.getStatus());
+        boolean isCompleted = Task.STATUS_COMPLETED.equals(task.getStatus());
         holder.cbDone.setOnCheckedChangeListener(null);
         holder.cbDone.setChecked(isCompleted);
         holder.cbDone.setEnabled(!task.isArchived());
@@ -136,7 +136,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
 
         holder.cbDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            task.setStatus(isChecked ? "Completed" : "In Progress");
+            task.setStatus(isChecked ? Task.STATUS_COMPLETED : Task.STATUS_IN_PROGRESS);
             notifyItemChanged(holder.getAdapterPosition());
             if (listener != null) {
                 listener.onTaskStatusChanged();

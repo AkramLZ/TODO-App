@@ -29,7 +29,13 @@ public class TasksActivity extends AppCompatActivity {
     private FloatingActionButton fabAddTask;
     private TaskAdapter taskAdapter;
     private List<Task> allTasks;
-    private final List<String> statusOptions = Arrays.asList("All", "In Progress", "Completed", "Archived");
+    private String currentUserId = "";
+    private final List<String> statusOptions = Arrays.asList(
+            "All",
+            Task.STATUS_IN_PROGRESS,
+            Task.STATUS_COMPLETED,
+            "Archived"
+    );
 
     private final ActivityResultLauncher<Intent> addTaskLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -64,7 +70,12 @@ public class TasksActivity extends AppCompatActivity {
         spStatusFilter = findViewById(R.id.sp_category_filter);
         fabAddTask = findViewById(R.id.fab_add_task);
 
-        allTasks = createSampleTasks();
+        currentUserId = getIntent().getStringExtra("email");
+        if (currentUserId == null || currentUserId.trim().isEmpty()) {
+            currentUserId = "local-user";
+        }
+
+        allTasks = createSampleTasks(currentUserId);
 
         taskAdapter = new TaskAdapter(new ArrayList<>(allTasks));
         taskAdapter.setOnTaskStatusChangedListener(this::refreshFilter);
@@ -76,6 +87,7 @@ public class TasksActivity extends AppCompatActivity {
             Intent intent = new Intent(TasksActivity.this, AddTaskActivity.class);
             intent.putExtra(AddTaskActivity.EXTRA_TASK, task);
             intent.putExtra(AddTaskActivity.EXTRA_TASK_INDEX, realIndex);
+            intent.putExtra(AddTaskActivity.EXTRA_USER_ID, currentUserId);
             editTaskLauncher.launch(intent);
         });
         rvTasks.setLayoutManager(new LinearLayoutManager(this));
@@ -85,6 +97,7 @@ public class TasksActivity extends AppCompatActivity {
 
         fabAddTask.setOnClickListener(v -> {
             Intent intent = new Intent(TasksActivity.this, AddTaskActivity.class);
+            intent.putExtra(AddTaskActivity.EXTRA_USER_ID, currentUserId);
             addTaskLauncher.launch(intent);
         });
     }
@@ -166,13 +179,14 @@ public class TasksActivity extends AppCompatActivity {
         refreshFilter();
     }
 
-    private List<Task> createSampleTasks() {
+    private List<Task> createSampleTasks(String userId) {
         List<Task> tasks = new ArrayList<>();
 
         tasks.add(new Task(
+                userId,
                 "Test1",
                 "First test task description",
-                "High", "In Progress", "Work", "10 April 2026",
+                "High", Task.STATUS_IN_PROGRESS, "Work", "10 April 2026",
                 Arrays.asList(
                         new Subtask("Subtask A", true),
                         new Subtask("Subtask B", false),
@@ -181,9 +195,10 @@ public class TasksActivity extends AppCompatActivity {
         ));
 
         tasks.add(new Task(
+                userId,
                 "Test2",
                 "Second test task description",
-                "Medium", "Completed", "Personal", "8 April 2026",
+                "Medium", Task.STATUS_COMPLETED, "Personal", "8 April 2026",
                 Arrays.asList(
                         new Subtask("Subtask A", true),
                         new Subtask("Subtask B", true)
@@ -191,9 +206,10 @@ public class TasksActivity extends AppCompatActivity {
         ));
 
         tasks.add(new Task(
+                userId,
                 "Test3",
                 "Third test task description",
-                "Low", "In Progress", "Study", "16 April 2026",
+                "Low", Task.STATUS_IN_PROGRESS, "Study", "16 April 2026",
                 Arrays.asList(
                         new Subtask("Subtask A", false)
                 )

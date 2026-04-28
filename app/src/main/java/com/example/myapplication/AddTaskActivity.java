@@ -24,6 +24,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK = "extra_task";
     public static final String EXTRA_TASK_INDEX = "extra_task_index";
+    public static final String EXTRA_USER_ID = "extra_user_id";
 
     private EditText etTitle, etDescription, etCategory, etSubtaskInput;
     private Spinner spPriority;
@@ -34,7 +35,11 @@ public class AddTaskActivity extends AppCompatActivity {
     private SubtaskAdapter subtaskAdapter;
     private List<Subtask> subtasks;
     private String selectedDate = "";
-    private String taskStatus = "In Progress";
+    private String taskId = "";
+    private String userId = "";
+    private String taskStatus = Task.STATUS_IN_PROGRESS;
+    private String createdAt = "";
+    private String completedAt = null;
     private boolean archived = false;
     private int editIndex = -1;
 
@@ -64,6 +69,10 @@ public class AddTaskActivity extends AppCompatActivity {
 
         // Check if editing an existing task
         Intent intent = getIntent();
+        userId = intent.getStringExtra(EXTRA_USER_ID);
+        if (userId == null) {
+            userId = "";
+        }
         if (intent.hasExtra(EXTRA_TASK)) {
             Task task = (Task) intent.getSerializableExtra(EXTRA_TASK);
             editIndex = intent.getIntExtra(EXTRA_TASK_INDEX, -1);
@@ -78,6 +87,10 @@ public class AddTaskActivity extends AppCompatActivity {
     }
 
     private void populateFields(Task task) {
+        taskId = task.getId();
+        userId = task.getUserId();
+        createdAt = task.getCreatedAt();
+        completedAt = task.getCompletedAt();
         etTitle.setText(task.getTitle());
         etDescription.setText(task.getDescription());
         etCategory.setText(task.getCategory());
@@ -148,6 +161,8 @@ public class AddTaskActivity extends AppCompatActivity {
         }
 
         Task task = new Task(
+                taskId,
+                userId,
                 title,
                 description,
                 priority,
@@ -155,7 +170,10 @@ public class AddTaskActivity extends AppCompatActivity {
                 category,
                 selectedDate,
                 new ArrayList<>(subtaskAdapter.getSubtasks()),
-                archived
+                archived,
+                createdAt,
+                Task.nowTimestamp(),
+                completedAt
         );
 
         Intent resultIntent = new Intent();
