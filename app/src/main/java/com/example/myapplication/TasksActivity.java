@@ -6,7 +6,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,7 +29,7 @@ public class TasksActivity extends AppCompatActivity {
     private FloatingActionButton fabAddTask;
     private TaskAdapter taskAdapter;
     private List<Task> allTasks;
-    private final List<String> statusOptions = Arrays.asList("All", "In Progress", "Completed");
+    private final List<String> statusOptions = Arrays.asList("All", "In Progress", "Completed", "Archived");
 
     private final ActivityResultLauncher<Intent> addTaskLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -66,6 +68,8 @@ public class TasksActivity extends AppCompatActivity {
 
         taskAdapter = new TaskAdapter(new ArrayList<>(allTasks));
         taskAdapter.setOnTaskStatusChangedListener(this::refreshFilter);
+        taskAdapter.setOnTaskDeleteListener(this::confirmDeleteTask);
+        taskAdapter.setOnTaskArchiveChangedListener(this::toggleArchivedTask);
         taskAdapter.setOnTaskClickListener((task, position) -> {
             int realIndex = allTasks.indexOf(task);
             if (realIndex < 0) return;
@@ -105,11 +109,25 @@ public class TasksActivity extends AppCompatActivity {
 
     private void applyFilter(String status) {
         if ("All".equals(status)) {
-            taskAdapter.setTasks(new ArrayList<>(allTasks));
+            List<Task> active = new ArrayList<>();
+            for (Task task : allTasks) {
+                if (!task.isArchived()) {
+                    active.add(task);
+                }
+            }
+            taskAdapter.setTasks(active);
+        } else if ("Archived".equals(status)) {
+            List<Task> archived = new ArrayList<>();
+            for (Task task : allTasks) {
+                if (task.isArchived()) {
+                    archived.add(task);
+                }
+            }
+            taskAdapter.setTasks(archived);
         } else {
             List<Task> filtered = new ArrayList<>();
             for (Task task : allTasks) {
-                if (task.getStatus().equals(status)) {
+                if (!task.isArchived() && task.getStatus().equals(status)) {
                     filtered.add(task);
                 }
             }
@@ -120,6 +138,32 @@ public class TasksActivity extends AppCompatActivity {
     private void refreshFilter() {
         String selected = statusOptions.get(spStatusFilter.getSelectedItemPosition());
         applyFilter(selected);
+    }
+
+    private void confirmDeleteTask(Task task) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete task")
+                .setMessage("This task will be removed from the list.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (dialog, which) -> deleteTask(task))
+                .show();
+    }
+
+    private void deleteTask(Task task) {
+        if (allTasks.remove(task)) {
+            Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
+            refreshFilter();
+        }
+    }
+
+    private void toggleArchivedTask(Task task) {
+        task.setArchived(!task.isArchived());
+        Toast.makeText(
+                this,
+                task.isArchived() ? "Task archived" : "Task restored",
+                Toast.LENGTH_SHORT
+        ).show();
+        refreshFilter();
     }
 
     private List<Task> createSampleTasks() {

@@ -34,6 +34,8 @@ public class AddTaskActivity extends AppCompatActivity {
     private SubtaskAdapter subtaskAdapter;
     private List<Subtask> subtasks;
     private String selectedDate = "";
+    private String taskStatus = "In Progress";
+    private boolean archived = false;
     private int editIndex = -1;
 
     @Override
@@ -79,6 +81,8 @@ public class AddTaskActivity extends AppCompatActivity {
         etTitle.setText(task.getTitle());
         etDescription.setText(task.getDescription());
         etCategory.setText(task.getCategory());
+        taskStatus = task.getStatus();
+        archived = task.isArchived();
 
         // Set priority spinner selection
         String priority = task.getPriority();
@@ -147,10 +151,11 @@ public class AddTaskActivity extends AppCompatActivity {
                 title,
                 description,
                 priority,
-                "In Progress",
+                taskStatus,
                 category,
                 selectedDate,
-                new ArrayList<>(subtaskAdapter.getSubtasks())
+                new ArrayList<>(subtaskAdapter.getSubtasks()),
+                archived
         );
 
         Intent resultIntent = new Intent();

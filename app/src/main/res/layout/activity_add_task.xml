@@ -22,7 +22,6 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <!-- Title -->
         <EditText
             android:id="@+id/et_task_title"
             android:layout_width="match_parent"
@@ -33,7 +32,6 @@
             android:inputType="text"
             android:textSize="20sp" />
 
-        <!-- Description -->
         <EditText
             android:id="@+id/et_task_description"
             android:layout_width="match_parent"
@@ -46,7 +44,6 @@
             android:minLines="3"
             android:textSize="20sp" />
 
-        <!-- Priority -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,7 +58,6 @@
             android:layout_marginTop="8dp"
             android:entries="@array/priority_options" />
 
-        <!-- Category -->
         <EditText
             android:id="@+id/et_task_category"
             android:layout_width="match_parent"
@@ -72,7 +68,6 @@
             android:inputType="text"
             android:textSize="20sp" />
 
-        <!-- Reminder Date -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -98,7 +93,6 @@
             tools:text="Apr 10, 2026"
             tools:visibility="visible" />
 
-        <!-- Subtasks Section -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -138,7 +132,6 @@
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="false" />
 
-        <!-- Bottom Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

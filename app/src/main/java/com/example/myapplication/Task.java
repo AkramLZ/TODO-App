@@ -11,9 +11,15 @@ public class Task implements Serializable {
     private String category;
     private String reminderDate;
     private List<Subtask> subtasks;
+    private boolean archived;
 
     public Task(String title, String description, String priority, String status,
                 String category, String reminderDate, List<Subtask> subtasks) {
+        this(title, description, priority, status, category, reminderDate, subtasks, false);
+    }
+
+    public Task(String title, String description, String priority, String status,
+                String category, String reminderDate, List<Subtask> subtasks, boolean archived) {
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -21,6 +27,7 @@ public class Task implements Serializable {
         this.category = category;
         this.reminderDate = reminderDate;
         this.subtasks = subtasks;
+        this.archived = archived;
     }
 
     public String getTitle() {
@@ -77,5 +84,13 @@ public class Task implements Serializable {
 
     public void setSubtasks(List<Subtask> subtasks) {
         this.subtasks = subtasks;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }

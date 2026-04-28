@@ -118,6 +118,38 @@
             android:textSize="13sp"
             tools:text="2/5 subtasks done" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btn_archive_task"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Archive task"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_archive_24"
+                android:tint="@android:color/darker_gray" />
+
+            <ImageButton
+                android:id="@+id/btn_delete_task"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete task"
+                android:padding="10dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_delete_24"
+                android:tint="#E24B4A" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

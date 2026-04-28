@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,9 +25,19 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         void onTaskClick(Task task, int position);
     }
 
+    public interface OnTaskDeleteListener {
+        void onTaskDelete(Task task);
+    }
+
+    public interface OnTaskArchiveChangedListener {
+        void onTaskArchiveChanged(Task task);
+    }
+
     private List<Task> tasks;
     private OnTaskStatusChangedListener listener;
     private OnTaskClickListener clickListener;
+    private OnTaskDeleteListener deleteListener;
+    private OnTaskArchiveChangedListener archiveChangedListener;
 
     public TaskAdapter(List<Task> tasks) {
         this.tasks = tasks;
@@ -45,6 +56,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         this.clickListener = clickListener;
     }
 
+    public void setOnTaskDeleteListener(OnTaskDeleteListener deleteListener) {
+        this.deleteListener = deleteListener;
+    }
+
+    public void setOnTaskArchiveChangedListener(OnTaskArchiveChangedListener archiveChangedListener) {
+        this.archiveChangedListener = archiveChangedListener;
+    }
+
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -60,7 +79,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.tvTitle.setText(task.getTitle());
         holder.tvDescription.setText(task.getDescription());
         holder.tvPriority.setText(task.getPriority());
-        holder.tvStatus.setText(task.getStatus());
+        holder.tvStatus.setText(task.isArchived() ? "Archived" : task.getStatus());
         holder.tvCategory.setText(task.getCategory());
         holder.tvReminder.setText(task.getReminderDate());
 
@@ -85,22 +104,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.tvPriority.setBackground(bg);
 
         int statusColor;
-        switch (task.getStatus()) {
-            case "In Progress":
-                statusColor = Color.parseColor("#378ADD");
-                break;
-            case "Completed":
-                statusColor = Color.parseColor("#639922");
-                break;
-            default:
-                statusColor = Color.GRAY;
-                break;
+        if (task.isArchived()) {
+            statusColor = Color.GRAY;
+        } else {
+            switch (task.getStatus()) {
+                case "In Progress":
+                    statusColor = Color.parseColor("#378ADD"); // blue
+                    break;
+                case "Completed":
+                    statusColor = Color.parseColor("#639922"); // green
+                    break;
+                default:
+                    statusColor = Color.GRAY;
+                    break;
+            }
         }
         holder.tvStatus.setTextColor(statusColor);
 
         boolean isCompleted = "Completed".equals(task.getStatus());
         holder.cbDone.setOnCheckedChangeListener(null);
         holder.cbDone.setChecked(isCompleted);
+        holder.cbDone.setEnabled(!task.isArchived());
 
         if (isCompleted) {
             holder.tvTitle.setPaintFlags(holder.tvTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
@@ -134,6 +158,24 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 clickListener.onTaskClick(task, holder.getAdapterPosition());
             }
         });
+
+        holder.btnArchive.setImageResource(task.isArchived()
+                ? R.drawable.ic_unarchive_24
+                : R.drawable.ic_archive_24);
+        holder.btnArchive.setContentDescription(task.isArchived()
+                ? "Unarchive task"
+                : "Archive task");
+        holder.btnArchive.setOnClickListener(v -> {
+            if (archiveChangedListener != null) {
+                archiveChangedListener.onTaskArchiveChanged(task);
+            }
+        });
+
+        holder.btnDelete.setOnClickListener(v -> {
+            if (deleteListener != null) {
+                deleteListener.onTaskDelete(task);
+            }
+        });
     }
 
     @Override
@@ -144,6 +186,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         CheckBox cbDone;
         TextView tvPriority, tvStatus, tvTitle, tvDescription, tvCategory, tvReminder, tvSubtasks;
+        ImageButton btnArchive, btnDelete;
 
         TaskViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -155,6 +198,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             tvCategory = itemView.findViewById(R.id.tv_task_category);
             tvReminder = itemView.findViewById(R.id.tv_task_reminder);
             tvSubtasks = itemView.findViewById(R.id.tv_task_subtasks);
+            btnArchive = itemView.findViewById(R.id.btn_archive_task);
+            btnDelete = itemView.findViewById(R.id.btn_delete_task);
         }
     }
 }
