@@ -85,6 +85,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         int priorityColor;
         switch (task.getPriority()) {
+            case "Urgent":
+                priorityColor = Color.parseColor("#9C1C28");
+                break;
             case "High":
                 priorityColor = Color.parseColor("#E24B4A");
                 break;
