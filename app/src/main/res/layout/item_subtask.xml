@@ -15,14 +15,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/tv_subtask_title"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_weight="1"
-        android:textSize="18sp"
-        tools:text="Subtask item" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_subtask_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            tools:text="Subtask item" />
+
+        <TextView
+            android:id="@+id/tv_subtask_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="Optional subtask details"
+            tools:visibility="visible" />
+
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/btn_delete_subtask"

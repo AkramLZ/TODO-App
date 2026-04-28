@@ -28,7 +28,7 @@ public class AddTaskActivity extends AppCompatActivity {
     public static final String EXTRA_USER_ID = "extra_user_id";
     public static final String EXTRA_CATEGORIES = "extra_categories";
 
-    private EditText etTitle, etDescription, etSubtaskInput;
+    private EditText etTitle, etDescription, etSubtaskInput, etSubtaskDescription;
     private Spinner spPriority, spCategory;
     private Button btnPickDate, btnAddSubtask, btnSave, btnCancel;
     private TextView tvSelectedDate, tvScreenTitle;
@@ -62,6 +62,7 @@ public class AddTaskActivity extends AppCompatActivity {
         btnPickDate = findViewById(R.id.btn_pick_date);
         tvSelectedDate = findViewById(R.id.tv_selected_date);
         etSubtaskInput = findViewById(R.id.et_subtask_input);
+        etSubtaskDescription = findViewById(R.id.et_subtask_description);
         btnAddSubtask = findViewById(R.id.btn_add_subtask);
         rvSubtasks = findViewById(R.id.rv_subtasks);
         btnSave = findViewById(R.id.btn_save_task);
@@ -128,7 +129,15 @@ public class AddTaskActivity extends AppCompatActivity {
         // Populate subtasks
         if (task.getSubtasks() != null) {
             for (Subtask s : task.getSubtasks()) {
-                subtasks.add(new Subtask(s.getTitle(), s.isDone()));
+                subtasks.add(new Subtask(
+                        s.getId(),
+                        s.getTaskId(),
+                        s.getTitle(),
+                        s.getDescription(),
+                        s.isDone(),
+                        s.getCreatedAt(),
+                        s.getUpdatedAt()
+                ));
             }
             subtaskAdapter.notifyDataSetChanged();
         }
@@ -205,13 +214,15 @@ public class AddTaskActivity extends AppCompatActivity {
 
     private void addSubtask() {
         String text = etSubtaskInput.getText().toString().trim();
+        String description = etSubtaskDescription.getText().toString().trim();
         if (text.isEmpty()) {
             Toast.makeText(this, "Enter subtask title", Toast.LENGTH_SHORT).show();
             return;
         }
-        subtasks.add(new Subtask(text, false));
+        subtasks.add(new Subtask(taskId, text, description, false));
         subtaskAdapter.notifyItemInserted(subtasks.size() - 1);
         etSubtaskInput.setText("");
+        etSubtaskDescription.setText("");
     }
 
     private void saveTask() {
@@ -227,6 +238,13 @@ public class AddTaskActivity extends AppCompatActivity {
         Category selectedCategory = categories.get(spCategory.getSelectedItemPosition());
         categoryId = selectedCategory.getId();
         categoryName = selectedCategory.getName();
+        if (taskId == null || taskId.trim().isEmpty()) {
+            taskId = Task.generateId();
+        }
+        List<Subtask> savedSubtasks = new ArrayList<>(subtaskAdapter.getSubtasks());
+        for (Subtask subtask : savedSubtasks) {
+            subtask.setTaskId(taskId);
+        }
 
         Task task = new Task(
                 taskId,
@@ -238,7 +256,7 @@ public class AddTaskActivity extends AppCompatActivity {
                 categoryId,
                 categoryName,
                 selectedDate,
-                new ArrayList<>(subtaskAdapter.getSubtasks()),
+                savedSubtasks,
                 archived,
                 createdAt,
                 Task.nowTimestamp(),

@@ -110,14 +110,31 @@
             android:layout_marginTop="12dp"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/et_subtask_input"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Add subtask..."
-                android:inputType="text"
-                android:textSize="18sp" />
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/et_subtask_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Subtask title"
+                    android:inputType="text"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/et_subtask_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:hint="Subtask description (optional)"
+                    android:inputType="textMultiLine"
+                    android:maxLines="3"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btn_add_subtask"

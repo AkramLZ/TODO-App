@@ -33,6 +33,14 @@ public class SubtaskAdapter extends RecyclerView.Adapter<SubtaskAdapter.SubtaskV
         Subtask subtask = subtasks.get(position);
 
         holder.tvTitle.setText(subtask.getTitle());
+        String description = subtask.getDescription();
+        if (description == null || description.trim().isEmpty()) {
+            holder.tvDescription.setVisibility(View.GONE);
+        } else {
+            holder.tvDescription.setText(description);
+            holder.tvDescription.setVisibility(View.VISIBLE);
+        }
+
         holder.cbDone.setOnCheckedChangeListener(null);
         holder.cbDone.setChecked(subtask.isDone());
 
@@ -59,13 +67,14 @@ public class SubtaskAdapter extends RecyclerView.Adapter<SubtaskAdapter.SubtaskV
 
     static class SubtaskViewHolder extends RecyclerView.ViewHolder {
         CheckBox cbDone;
-        TextView tvTitle;
+        TextView tvTitle, tvDescription;
         ImageButton btnDelete;
 
         SubtaskViewHolder(@NonNull View itemView) {
             super(itemView);
             cbDone = itemView.findViewById(R.id.cb_subtask_done);
             tvTitle = itemView.findViewById(R.id.tv_subtask_title);
+            tvDescription = itemView.findViewById(R.id.tv_subtask_description);
             btnDelete = itemView.findViewById(R.id.btn_delete_subtask);
         }
     }

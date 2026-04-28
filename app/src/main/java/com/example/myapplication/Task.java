@@ -59,7 +59,7 @@ public class Task implements Serializable {
                 List<Subtask> subtasks, boolean archived, String createdAt, String updatedAt,
                 String completedAt) {
         String now = nowTimestamp();
-        this.id = isBlank(id) ? UUID.randomUUID().toString() : id;
+        this.id = isBlank(id) ? generateId() : id;
         this.userId = userId == null ? "" : userId;
         this.title = title;
         this.description = description;
@@ -78,6 +78,10 @@ public class Task implements Serializable {
 
     public static String nowTimestamp() {
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US).format(new Date());
+    }
+
+    public static String generateId() {
+        return UUID.randomUUID().toString();
     }
 
     private static boolean isBlank(String value) {
