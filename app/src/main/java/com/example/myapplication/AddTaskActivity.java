@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -25,9 +26,10 @@ public class AddTaskActivity extends AppCompatActivity {
     public static final String EXTRA_TASK = "extra_task";
     public static final String EXTRA_TASK_INDEX = "extra_task_index";
     public static final String EXTRA_USER_ID = "extra_user_id";
+    public static final String EXTRA_CATEGORIES = "extra_categories";
 
-    private EditText etTitle, etDescription, etCategory, etSubtaskInput;
-    private Spinner spPriority;
+    private EditText etTitle, etDescription, etSubtaskInput;
+    private Spinner spPriority, spCategory;
     private Button btnPickDate, btnAddSubtask, btnSave, btnCancel;
     private TextView tvSelectedDate, tvScreenTitle;
     private RecyclerView rvSubtasks;
@@ -37,11 +39,14 @@ public class AddTaskActivity extends AppCompatActivity {
     private String selectedDate = "";
     private String taskId = "";
     private String userId = "";
+    private String categoryId = "";
+    private String categoryName = Category.GENERAL_NAME;
     private String taskStatus = Task.STATUS_IN_PROGRESS;
     private String createdAt = "";
     private String completedAt = null;
     private boolean archived = false;
     private int editIndex = -1;
+    private ArrayList<Category> categories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +58,7 @@ public class AddTaskActivity extends AppCompatActivity {
         etTitle = findViewById(R.id.et_task_title);
         etDescription = findViewById(R.id.et_task_description);
         spPriority = findViewById(R.id.sp_task_priority);
-        etCategory = findViewById(R.id.et_task_category);
+        spCategory = findViewById(R.id.sp_task_category);
         btnPickDate = findViewById(R.id.btn_pick_date);
         tvSelectedDate = findViewById(R.id.tv_selected_date);
         etSubtaskInput = findViewById(R.id.et_subtask_input);
@@ -73,6 +78,8 @@ public class AddTaskActivity extends AppCompatActivity {
         if (userId == null) {
             userId = "";
         }
+        categories = readCategoriesFromIntent(intent);
+        setupCategorySpinner();
         if (intent.hasExtra(EXTRA_TASK)) {
             Task task = (Task) intent.getSerializableExtra(EXTRA_TASK);
             editIndex = intent.getIntExtra(EXTRA_TASK_INDEX, -1);
@@ -88,14 +95,18 @@ public class AddTaskActivity extends AppCompatActivity {
 
     private void populateFields(Task task) {
         taskId = task.getId();
-        userId = task.getUserId();
+        if (task.getUserId() != null && !task.getUserId().trim().isEmpty()) {
+            userId = task.getUserId();
+        }
+        categoryId = task.getCategoryId();
+        categoryName = task.getCategory();
         createdAt = task.getCreatedAt();
         completedAt = task.getCompletedAt();
         etTitle.setText(task.getTitle());
         etDescription.setText(task.getDescription());
-        etCategory.setText(task.getCategory());
         taskStatus = task.getStatus();
         archived = task.isArchived();
+        selectCategory(task);
 
         // Set priority spinner selection
         String priority = task.getPriority();
@@ -121,6 +132,64 @@ public class AddTaskActivity extends AppCompatActivity {
             }
             subtaskAdapter.notifyDataSetChanged();
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private ArrayList<Category> readCategoriesFromIntent(Intent intent) {
+        Object value = intent.getSerializableExtra(EXTRA_CATEGORIES);
+        if (value instanceof ArrayList) {
+            ArrayList<Category> result = new ArrayList<>((ArrayList<Category>) value);
+            Category.ensureGeneralCategory(result, userId);
+            return result;
+        }
+        return Category.defaultCategories(userId);
+    }
+
+    private void setupCategorySpinner() {
+        ArrayList<String> names = new ArrayList<>();
+        for (Category category : categories) {
+            names.add(category.getName());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, names);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spCategory.setAdapter(adapter);
+        selectCategoryByName(Category.GENERAL_NAME);
+    }
+
+    private void selectCategory(Task task) {
+        if (selectCategoryById(task.getCategoryId())) {
+            return;
+        }
+        if (!selectCategoryByName(task.getCategory())) {
+            selectCategoryByName(Category.GENERAL_NAME);
+        }
+    }
+
+    private boolean selectCategoryById(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < categories.size(); i++) {
+            if (categories.get(i).getId().equals(id)) {
+                spCategory.setSelection(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean selectCategoryByName(String name) {
+        if (name == null) {
+            return false;
+        }
+        for (int i = 0; i < categories.size(); i++) {
+            if (categories.get(i).getName().equalsIgnoreCase(name)) {
+                spCategory.setSelection(i);
+                return true;
+            }
+        }
+        return false;
     }
 
     private void showDatePicker() {
@@ -155,10 +224,9 @@ public class AddTaskActivity extends AppCompatActivity {
 
         String description = etDescription.getText().toString().trim();
         String priority = spPriority.getSelectedItem().toString();
-        String category = etCategory.getText().toString().trim();
-        if (category.isEmpty()) {
-            category = "General";
-        }
+        Category selectedCategory = categories.get(spCategory.getSelectedItemPosition());
+        categoryId = selectedCategory.getId();
+        categoryName = selectedCategory.getName();
 
         Task task = new Task(
                 taskId,
@@ -167,7 +235,8 @@ public class AddTaskActivity extends AppCompatActivity {
                 description,
                 priority,
                 taskStatus,
-                category,
+                categoryId,
+                categoryName,
                 selectedDate,
                 new ArrayList<>(subtaskAdapter.getSubtasks()),
                 archived,

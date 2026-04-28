@@ -58,15 +58,18 @@
             android:layout_marginTop="8dp"
             android:entries="@array/priority_options" />
 
-        <EditText
-            android:id="@+id/et_task_category"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:ems="10"
-            android:hint="Category"
-            android:inputType="text"
-            android:textSize="20sp" />
+            android:text="Category"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/sp_task_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -17,6 +17,7 @@ public class Task implements Serializable {
     private String description;
     private String priority;
     private String status;
+    private String categoryId;
     private String category;
     private String reminderDate;
     private List<Subtask> subtasks;
@@ -49,6 +50,14 @@ public class Task implements Serializable {
     public Task(String id, String userId, String title, String description, String priority,
                 String status, String category, String reminderDate, List<Subtask> subtasks,
                 boolean archived, String createdAt, String updatedAt, String completedAt) {
+        this(id, userId, title, description, priority, status, "", category, reminderDate, subtasks,
+                archived, createdAt, updatedAt, completedAt);
+    }
+
+    public Task(String id, String userId, String title, String description, String priority,
+                String status, String categoryId, String category, String reminderDate,
+                List<Subtask> subtasks, boolean archived, String createdAt, String updatedAt,
+                String completedAt) {
         String now = nowTimestamp();
         this.id = isBlank(id) ? UUID.randomUUID().toString() : id;
         this.userId = userId == null ? "" : userId;
@@ -56,6 +65,7 @@ public class Task implements Serializable {
         this.description = description;
         this.priority = priority;
         this.status = status;
+        this.categoryId = categoryId == null ? "" : categoryId;
         this.category = category;
         this.reminderDate = reminderDate;
         this.subtasks = subtasks;
@@ -140,7 +150,22 @@ public class Task implements Serializable {
         return category;
     }
 
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        if (this.categoryId != null && this.categoryId.equals(categoryId)) {
+            return;
+        }
+        this.categoryId = categoryId == null ? "" : categoryId;
+        touch();
+    }
+
     public void setCategory(String category) {
+        if (this.category != null && this.category.equals(category)) {
+            return;
+        }
         this.category = category;
         touch();
     }

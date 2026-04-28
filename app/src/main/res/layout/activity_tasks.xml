@@ -22,11 +22,38 @@
             android:textSize="28sp"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/btn_manage_categories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Manage Categories" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Status"
+            android:textSize="14sp" />
+
+        <Spinner
+            android:id="@+id/sp_status_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Category"
+            android:textSize="14sp" />
+
         <Spinner
             android:id="@+id/sp_category_filter"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="4dp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_tasks"
