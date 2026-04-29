@@ -34,8 +34,6 @@ public class Category implements Serializable {
         categories.add(new Category(userId, "Work", "#3F51B5"));
         categories.add(new Category(userId, "Study", "#009688"));
         categories.add(new Category(userId, "Personal", "#8E44AD"));
-        categories.add(new Category(userId, "Shopping", "#EF9F27"));
-        categories.add(new Category(userId, "Health", "#639922"));
         return categories;
     }
 
