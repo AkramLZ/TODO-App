@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,13 +30,15 @@ public class TasksActivity extends AppCompatActivity {
 
     private RecyclerView rvTasks;
     private Spinner spStatusFilter, spCategoryFilter;
-    private Button btnManageCategories;
+    private Button btnManageCategories, btnLogout;
     private FloatingActionButton fabAddTask;
     private TaskAdapter taskAdapter;
     private List<Task> allTasks;
     private ArrayList<Category> categories;
     private String currentUserId = "";
     private final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
+    private static final String AUTH_PREFS = "todo_auth";
+    private static final String SESSION_EMAIL = "session_email";
     private static final String ALL_CATEGORIES = "All Categories";
     private final List<String> statusOptions = Arrays.asList(
             "All",
@@ -93,6 +96,7 @@ public class TasksActivity extends AppCompatActivity {
         spStatusFilter = findViewById(R.id.sp_status_filter);
         spCategoryFilter = findViewById(R.id.sp_category_filter);
         btnManageCategories = findViewById(R.id.btn_manage_categories);
+        btnLogout = findViewById(R.id.btn_logout);
         fabAddTask = findViewById(R.id.fab_add_task);
 
         currentUserId = getIntent().getStringExtra("email");
@@ -134,6 +138,8 @@ public class TasksActivity extends AppCompatActivity {
             intent.putExtra(CategoriesActivity.EXTRA_CATEGORIES, categories);
             categoriesLauncher.launch(intent);
         });
+
+        btnLogout.setOnClickListener(v -> logout());
 
         fabAddTask.setOnClickListener(v -> {
             Intent intent = new Intent(TasksActivity.this, AddTaskActivity.class);
@@ -248,6 +254,16 @@ public class TasksActivity extends AppCompatActivity {
                 Toast.LENGTH_SHORT
         ).show();
         refreshFilter();
+    }
+
+    private void logout() {
+        SharedPreferences authPrefs = getSharedPreferences(AUTH_PREFS, MODE_PRIVATE);
+        authPrefs.edit().remove(SESSION_EMAIL).apply();
+
+        Intent intent = new Intent(TasksActivity.this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_LOGOUT, true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     @SuppressWarnings("unchecked")
