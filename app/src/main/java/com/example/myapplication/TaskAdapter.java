@@ -18,7 +18,7 @@ import java.util.List;
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
     public interface OnTaskStatusChangedListener {
-        void onTaskStatusChanged();
+        void onTaskStatusChanged(Task task);
     }
 
     public interface OnTaskClickListener {
@@ -139,7 +139,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             task.setStatus(isChecked ? Task.STATUS_COMPLETED : Task.STATUS_IN_PROGRESS);
             notifyItemChanged(holder.getAdapterPosition());
             if (listener != null) {
-                listener.onTaskStatusChanged();
+                listener.onTaskStatusChanged(task);
             }
         });
 

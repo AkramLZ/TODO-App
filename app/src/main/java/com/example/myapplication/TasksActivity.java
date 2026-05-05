@@ -22,6 +22,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TasksActivity extends AppCompatActivity {
 
@@ -33,6 +35,7 @@ public class TasksActivity extends AppCompatActivity {
     private List<Task> allTasks;
     private ArrayList<Category> categories;
     private String currentUserId = "";
+    private final ExecutorService databaseExecutor = Executors.newSingleThreadExecutor();
     private static final String ALL_CATEGORIES = "All Categories";
     private final List<String> statusOptions = Arrays.asList(
             "All",
@@ -47,6 +50,7 @@ public class TasksActivity extends AppCompatActivity {
                     Task task = (Task) result.getData().getSerializableExtra(AddTaskActivity.EXTRA_TASK);
                     if (task != null) {
                         allTasks.add(task);
+                        saveTaskToStorage(task);
                         refreshFilter();
                     }
                 }
@@ -59,6 +63,7 @@ public class TasksActivity extends AppCompatActivity {
                     int index = result.getData().getIntExtra(AddTaskActivity.EXTRA_TASK_INDEX, -1);
                     if (task != null && index >= 0 && index < allTasks.size()) {
                         allTasks.set(index, task);
+                        saveTaskToStorage(task);
                         refreshFilter();
                     }
                 }
@@ -71,6 +76,7 @@ public class TasksActivity extends AppCompatActivity {
                     if (updatedCategories != null) {
                         categories = updatedCategories;
                         normalizeTaskCategories();
+                        saveAllTasksToStorage();
                         setupCategoryFilter();
                         refreshFilter();
                     }
@@ -95,11 +101,14 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         categories = Category.defaultCategories(currentUserId);
-        allTasks = createSampleTasks(currentUserId);
+        allTasks = new ArrayList<>();
         normalizeTaskCategories();
 
         taskAdapter = new TaskAdapter(new ArrayList<>(allTasks));
-        taskAdapter.setOnTaskStatusChangedListener(this::refreshFilter);
+        taskAdapter.setOnTaskStatusChangedListener(task -> {
+            saveTaskToStorage(task);
+            refreshFilter();
+        });
         taskAdapter.setOnTaskDeleteListener(this::confirmDeleteTask);
         taskAdapter.setOnTaskArchiveChangedListener(this::toggleArchivedTask);
         taskAdapter.setOnTaskClickListener((task, position) -> {
@@ -117,6 +126,7 @@ public class TasksActivity extends AppCompatActivity {
 
         setupStatusFilter();
         setupCategoryFilter();
+        loadTasksFromStorage();
 
         btnManageCategories.setOnClickListener(v -> {
             Intent intent = new Intent(TasksActivity.this, CategoriesActivity.class);
@@ -223,6 +233,7 @@ public class TasksActivity extends AppCompatActivity {
 
     private void deleteTask(Task task) {
         if (allTasks.remove(task)) {
+            deleteTaskFromStorage(task);
             Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
             refreshFilter();
         }
@@ -230,6 +241,7 @@ public class TasksActivity extends AppCompatActivity {
 
     private void toggleArchivedTask(Task task) {
         task.setArchived(!task.isArchived());
+        saveTaskToStorage(task);
         Toast.makeText(
                 this,
                 task.isArchived() ? "Task archived" : "Task restored",
@@ -262,6 +274,43 @@ public class TasksActivity extends AppCompatActivity {
             task.setCategoryId(category.getId());
             task.setCategory(category.getName());
         }
+    }
+
+    private void loadTasksFromStorage() {
+        databaseExecutor.execute(() -> {
+            ArrayList<Task> storedTasks = TaskRepository.loadTasks(getApplicationContext(), currentUserId);
+            runOnUiThread(() -> {
+                allTasks.clear();
+                allTasks.addAll(storedTasks);
+                normalizeTaskCategories();
+                refreshFilter();
+            });
+        });
+    }
+
+    private void saveTaskToStorage(Task task) {
+        databaseExecutor.execute(() ->
+                TaskRepository.saveTask(getApplicationContext(), task)
+        );
+    }
+
+    private void saveAllTasksToStorage() {
+        List<Task> snapshot = new ArrayList<>(allTasks);
+        databaseExecutor.execute(() ->
+                TaskRepository.saveTasks(getApplicationContext(), snapshot)
+        );
+    }
+
+    private void deleteTaskFromStorage(Task task) {
+        databaseExecutor.execute(() ->
+                TaskRepository.deleteTask(getApplicationContext(), task)
+        );
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseExecutor.shutdown();
     }
 
     private Category findCategoryById(String id) {

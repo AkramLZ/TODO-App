@@ -30,10 +30,10 @@ public class Category implements Serializable {
 
     public static ArrayList<Category> defaultCategories(String userId) {
         ArrayList<Category> categories = new ArrayList<>();
-        categories.add(new Category(userId, GENERAL_NAME, "#607D8B"));
-        categories.add(new Category(userId, "Work", "#3F51B5"));
-        categories.add(new Category(userId, "Study", "#009688"));
-        categories.add(new Category(userId, "Personal", "#8E44AD"));
+        categories.add(new Category("general", userId, GENERAL_NAME, "#607D8B", Task.nowTimestamp()));
+        categories.add(new Category("work", userId, "Work", "#3F51B5", Task.nowTimestamp()));
+        categories.add(new Category("study", userId, "Study", "#009688", Task.nowTimestamp()));
+        categories.add(new Category("personal", userId, "Personal", "#8E44AD", Task.nowTimestamp()));
         return categories;
     }
 

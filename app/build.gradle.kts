@@ -33,6 +33,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
 }
 
 dependencies {
@@ -41,6 +44,11 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.okhttp)
+    implementation(libs.room.common.jvm)
+    implementation(libs.room3.common.jvm)
+    implementation(libs.room3.runtime)
+    implementation(libs.sqlite.framework)
+    annotationProcessor(libs.room3.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
